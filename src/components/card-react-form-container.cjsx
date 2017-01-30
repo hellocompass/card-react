@@ -105,7 +105,7 @@ CardReactFormContainer = React.createClass
         return React.cloneElement(child, {
           onKeyUp: @inputOnKeyUp
           onFocus: @inputOnFocus
-          onBlur: @inputOnBlur
+          onBlur: (e) => @inputOnBlur( e, child.props.onBlur )
           ref: @inputsRefs[child.props.name]
           defaultValue: @inputsValues[child.props.name]
           className: newClassName
@@ -117,6 +117,8 @@ CardReactFormContainer = React.createClass
   inputOnKeyUp: (event)->
     @inputsValues[event.target.name] = event.target.value
     @validateInput event.target.name, event.target.value
+    if (this.focusedInput == this.props.formInputsNames['number'])
+      this.props.updateNumber( event.target.value );
     @renderCardComponent()
 
   inputOnFocus: (event)->
@@ -126,10 +128,11 @@ CardReactFormContainer = React.createClass
       @cardFlipped = true
     @renderCardComponent()
 
-  inputOnBlur: (event)->
+  inputOnBlur: (event, onBlur)->
     @focusedInput = ''
     @cardFlipped = false
     @renderCardComponent()
+    onBlur(event) if onBlur
 
   validateInput: (inputName, inputValue)->
     inputsNames = @props.formInputsNames
